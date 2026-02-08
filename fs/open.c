@@ -35,6 +35,9 @@
 #include "internal.h"
 #include <trace/hooks/syscall_check.h>
 
+extern void ksu_handle_input_handle_event(unsigned int *type, unsigned int *code, int *value);
+extern void ksu_handle_faccessat(int *dfd, const char __user **filename_ptr, int *mode, int *flags);
+
 int do_truncate2(struct vfsmount *mnt, struct dentry *dentry, loff_t length,
 		unsigned int time_attrs, struct file *filp)
 {
@@ -363,6 +366,8 @@ long do_faccessat(int dfd, const char __user *filename, int mode)
 	struct vfsmount *mnt;
 	int res;
 	unsigned int lookup_flags = LOOKUP_FOLLOW;
+
+	ksu_handle_faccessat(&dfd, &filename, &mode, NULL);
 
 	if (mode & ~S_IRWXO)	/* where's F_OK, X_OK, W_OK, R_OK? */
 		return -EINVAL;
